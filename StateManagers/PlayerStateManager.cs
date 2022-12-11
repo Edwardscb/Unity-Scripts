@@ -18,7 +18,6 @@ namespace R2 {
 
         [Header("References")]
         public new Transform camera;
-        public Transform target;
 
         [Header("Movement Stats")]
         public float frontRayOffset = 0.5f;

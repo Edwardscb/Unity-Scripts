@@ -22,17 +22,32 @@ namespace R2
 
             float frontY = 0;
             RaycastHit hit;
-            Vector3 origin = states.mTransform.position + (states.mTransform.forward * states.frontRayOffset);
+            Vector3 targetVelocity = Vector3.zero;  // do this and then the if statement to do as few operations as possible:
+
+            if (states.lockOn)
+            {
+                targetVelocity = states.mTransform.forward * states.vertical * states.movementSpeed;
+                targetVelocity += states.mTransform.right * states.horizontal * states.movementSpeed;
+            }
+            else
+            {
+
+                targetVelocity = states.mTransform.forward * states.moveAmount * states.movementSpeed;
+            }
+
+            Vector3 origin = states.mTransform.position + (targetVelocity.normalized * states.frontRayOffset); // (states.mTransform.forward * states.frontRayOffset) is the direction we want to go
+
             origin.y += .5f;
             Debug.DrawRay(origin, -Vector3.up, Color.red, .01f, false);
             if (Physics.Raycast(origin, -Vector3.up, out hit, 1, states.ignoreForGroundCheck))
             {
                 float y = hit.point.y;
                 frontY = y - states.mTransform.position.y;
+                // this checks for angle
+
             }
 
             Vector3 currentVelocity = states.rigidbody.velocity;
-            Vector3 targetVelocity = states.mTransform.forward * states.moveAmount * states.movementSpeed;
 
             // if (states.isLockingOn)
             // {
@@ -86,27 +101,26 @@ namespace R2
         void HandleRotation()
         {
 
-            if (states.target)
-            // if we have a target, we want to face the target (enemy) so the below code helps with that
-            {
-                Vector3 dir = states.target.position - states.mTransform.position;
-                dir.Normalize();
-                dir.y = 0;
-                states.mTransform.rotation = Quaternion.LookRotation(dir);
-                // the above code (Quaternion?) hardcodes the rotation, but we can/will fix that later
 
-                return;
+            Vector3 targetDir = Vectory3.zero;
+            
+            if (states.lockOn)
+            {
+                targetDir = states.target.position - states.mTransform.position;
+            }
+            else 
+            {
+                // can get horizontal and vertical from PlayerStateManager (which inherits from CharacterStateManager)
+                float h = states.horizontal;
+                float v = states.vertical;
+
+                targetDir = states.camera.transform.forward * v;
+                targetDir += states.camera.transform.right * h;
             }
 
-            // can get horizontal and vertical from PlayerStateManager (which inherits from CharacterStateManager)
-            float h = states.horizontal;
-            float v = states.vertical;
-
-            Vector3 targetDir = states.camera.transform.forward * v;
-            targetDir += states.camera.transform.right * h;
             targetDir.Normalize();
-
             targetDir.y = 0;
+            
             if (targetDir == Vector3.zero)
                 targetDir = states.mTransform.forward;
 

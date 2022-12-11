@@ -16,11 +16,14 @@ namespace R2
         [Header("States")] // moved this from player state manager to here because enemies can use these too
         public bool isGrounded;
         public bool useRootMotion;
+        public bool lockOn; 
+        // putting lockOn inside CharacterStateManager because even enemies will be in lockOn state\
+        public Transform target;
+
 
         [Header("Controller Values")]
         public float vertical;
         public float horizontal;
-        public bool lockOn;
         public float delta;
         public Vector3 rootMovement;
 
@@ -43,6 +46,19 @@ namespace R2
         {
             anim.SetBool("isInteracting", isInteracting);
             anim.CrossFade(targetAnim, 0.2f);
+        }
+
+        public virtual void OnAssignLookOverride(Transform target)
+        // we still need to be able to override OnAssignLookOverride on our player - so we added virtual before void here and OnClearLookOverride
+        {
+            this.target = target;
+            if(target != null)
+                lockOn = true;
+        }
+
+        public virtual void OnClearLookOverride()
+        {
+            lockOn = false;
         }
 
     }
