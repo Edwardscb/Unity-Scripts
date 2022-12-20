@@ -17,7 +17,7 @@ namespace R2
         public bool isGrounded;
         public bool useRootMotion;
         public bool lockOn; 
-        // putting lockOn inside CharacterStateManager because even enemies will be in lockOn state\
+        // putting lockOn inside CharacterStateManager because even enemies will be in lockOn state
         public Transform target;
 
 

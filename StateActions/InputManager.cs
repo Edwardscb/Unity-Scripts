@@ -68,10 +68,22 @@ namespace R2
 
             s.moveAmount = Mathf.Clamp01(Mathf.Abs(s.horizontal) + Mathf.Abs(s.vertical)); 
             // find the move amount. Clamp01 makes it between 0 and 1 so you don't have to add those parameters at the end of the statement(?)
-           
-            
 
             retVal = HandleAttacking();
+
+            // for now, we are hardcoding the lock on
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                // if lock on is active, clear lock on
+                if(s.lockOn)
+                {
+                    s.OnClearLookOverride();
+                }
+                else
+                {
+                    s.OnAssignLookOverride(s.target);
+                }
+            }
             
             
             return retVal;

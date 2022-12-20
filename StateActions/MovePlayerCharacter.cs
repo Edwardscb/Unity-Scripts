@@ -101,12 +101,15 @@ namespace R2
         void HandleRotation()
         {
 
+            // added moveOverride as states.moveAmount, added it in the if state for states.lockOn, as well as the last Quaternion targetRotation so the user doesn't have to move for the camera to rotate on lock on
 
-            Vector3 targetDir = Vectory3.zero;
+            Vector3 targetDir = Vector3.zero;
+            float moveOverride = states.moveAmount;
             
             if (states.lockOn)
             {
                 targetDir = states.target.position - states.mTransform.position;
+                moveOverride = 1;
             }
             else 
             {
@@ -120,14 +123,14 @@ namespace R2
 
             targetDir.Normalize();
             targetDir.y = 0;
-            
+
             if (targetDir == Vector3.zero)
                 targetDir = states.mTransform.forward;
 
             Quaternion tr = Quaternion.LookRotation(targetDir);
             Quaternion targetRotation = Quaternion.Slerp(
                 states.mTransform.rotation, tr,
-                states.delta * states.moveAmount * states.rotationSpeed);
+                states.delta * moveOverride * states.rotationSpeed);
             
             states.mTransform.rotation = targetRotation;
             
@@ -137,15 +140,49 @@ namespace R2
         {
             if(states.isGrounded)
             {
+                if (states.lockOn)
+                {
+                    // the below will pass new values to our animations
+                    float v = Mathf.Abs(states.vertical);
+                    float f = 0;
+                    if (v > 0 && v <= 0.5f)
+                        f = 0.5f;
+                    else if (v > 0.5f)
+                        f = 1;
+                    
+                    // we are adding the following code so that the values returned from moving left can be interpreted (negatives)
+                    if (states.vertical < 0)
+                        f = -f;
 
-                float m = states.moveAmount;
-                float f = 0;
-                if (m > 0 && m <= 0.5f)
-                    f = 0.5f;
-                else if (m > 0.5f)
-                    f = 1;
+                    states.anim.SetFloat("forward", f, 0.2f, states.delta);
 
-                states.anim.SetFloat("forward", f, 0.2f, states.delta);
+                    float h = Mathf.Abs(states.horizontal);
+                    // the s is for sideways
+                    float s = 0;
+                    if (h > 0 && h <= 0.5f)
+                        s = 0.5f;
+                    else if (h > 0.5f)
+                        s = 1;
+
+                    // see note above for f
+                    if (states.horizontal < 0)
+                        s = -1;
+
+                    states.anim.SetFloat("sideways", s, 0.2f, states.delta);
+                }
+                else
+                {
+                    // also, the above allows us to make sure that sideways is always 0 if we want
+                    float m = states.moveAmount;
+                    float f = 0;
+                    if (m > 0 && m <= 0.5f)
+                        f = 0.5f;
+                    else if (m > 0.5f)
+                        f = 1;
+
+                    states.anim.SetFloat("forward", f, 0.2f, states.delta);
+                    states.anim.SetFloat("sideways", 0, 0.2f, states.delta);
+                }
             }
             else
             {

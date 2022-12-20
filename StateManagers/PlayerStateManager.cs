@@ -18,6 +18,8 @@ namespace R2 {
 
         [Header("References")]
         public new Transform camera;
+        public Cinemachine.CinemachineFreeLook normalCamera;
+        public Cinemachine.CinemachineFreeLook lockOnCamera;
 
         [Header("Movement Stats")]
         public float frontRayOffset = 0.5f;
@@ -98,8 +100,18 @@ namespace R2 {
             base.FixedTick();
         }
 
+        // some debugging things:
+        public bool debugLock;
+
         private void Update()
         {
+            // some debugging stuff:
+            //if (debugLock)
+           // {
+           //     debugLock = false;
+           //     OnAssignLookOverride(target);
+           // }
+
             delta = Time.deltaTime;
 
             base.Tick();
@@ -111,8 +123,34 @@ namespace R2 {
             base.LateTick();
         }
 
+        #region Lock on
+        public override void OnAssignLookOverride(Transform target)
+        {
+
+            base.OnAssignLookOverride(target);
+            // we don't want to run any code if we hit the button for lock on and it returns null or false
+            if (lockOn == false)
+                return;
+
+            // switches the camera from normal to lock on and then tells the camera what to look at
+            normalCamera.gameObject.SetActive(false);
+            lockOnCamera.gameObject.SetActive(true);
+            lockOnCamera.m_LookAt = target;
+        }
+
+        public override void OnClearLookOverride()
+        {
+            base.OnClearLookOverride();
+
+            // on clear we reverse the previous step
+            normalCamera.gameObject.SetActive(true);
+            lockOnCamera.gameObject.SetActive(false);
+        }
+
+        #endregion
+
+
         #region State Events
-        // 
 
         void DisableRootMotion()
         {
