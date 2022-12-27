@@ -35,13 +35,13 @@ namespace R2
 
         public void LoadItem(ClothItem clothItem, ClothItemType clothItemType)
         {
-            ClothItemHook itemHook == null;
+            ClothItemHook itemHook = null;
 
             if(clothItem == null)
             {
                 if (clothItemType != null)
                 {
-                    itemHook = GetClothHook(clothItemType);
+                    itemHook = getClothHook(clothItemType);
                     if (clothItemType.isDisabledWhenNoItem)
                     {
                         itemHook.UnloadItem();
@@ -53,7 +53,7 @@ namespace R2
 
             }
             
-            itemHook = GetClothHook(clothItemType);
+            itemHook = getClothHook(clothItemType);
             itemHook.LoadClothItem(clothItem);
             // he used a quick action to generate the LoadClothItem method onto ClothItemHook - be sure to get that method
 
