@@ -172,14 +172,21 @@ namespace R2
                 }
                 else
                 {
+
+                    // should be fairly simple to know if you're in lock on or not, but debug any way
+                    // Debug.Log("no lock on");
+
                     // also, the above allows us to make sure that sideways is always 0 if we want
                     float m = states.moveAmount;
                     float f = 0;
                     if (m > 0 && m <= 0.5f)
+                    // if movement is greater than zero and 0.5f or lower, then clamp it to 0.5f
                         f = 0.5f;
                     else if (m > 0.5f)
+                    // if movement is greater than 0.5f then set equal to 1
                         f = 1;
 
+                    // Debug.Log(f);
                     states.anim.SetFloat("forward", f, 0.2f, states.delta);
                     states.anim.SetFloat("sideways", 0, 0.2f, states.delta);
                 }
